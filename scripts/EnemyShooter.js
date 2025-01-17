@@ -30,7 +30,7 @@ export default class EnemyShooter {
         this.shootTimer += deltaTime;
         if(this.shootTimer >= this.shootDelay) {
             this.shoot();
-            shootTimer = 0;
+            this.shootTimer = 0;
         }
 
         this.updateRotation();
