@@ -315,7 +315,7 @@ class Player extends Entity {
             case 's': case 'arrowdown': this.input.down = true; break;
             case 'a': case 'arrowleft': this.input.left = true; break;
             case 'd': case 'arrowright': this.input.right = true; break;
-            case ' ': case 'space': this.input.space = true; break;
+            case ' ': case 'space': this.input.action = true; break;
             case 'enter': this.input.action = true; break;
         }
     }
@@ -330,7 +330,7 @@ class Player extends Entity {
             case 's': case 'arrowdown': this.input.down = false; break;
             case 'a': case 'arrowleft': this.input.left = false; break;
             case 'd': case 'arrowright': this.input.right = false; break;
-            case ' ': case 'space': this.input.space = false; break;
+            case ' ': case 'space': this.input.action = false; break;
             case 'enter': this.input.action = false; break;
         }
     }
