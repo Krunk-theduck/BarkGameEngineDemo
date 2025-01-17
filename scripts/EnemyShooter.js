@@ -49,7 +49,8 @@ export default class EnemyShooter {
         this.rotation = angleDegrees;
     }
 
-    render(ctx) {
+    render() {
+        let ctx = window.mainCamera.ctx;
         ctx.save();
         
         // Position and transform
