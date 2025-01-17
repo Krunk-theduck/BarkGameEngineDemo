@@ -12,12 +12,16 @@ engine.setDebug(true, {
 
 const gameScene = new Scene();
 var player;
+var enemy;
 
 async function initializeGame() {
     console.log('Bark Engine initializing...');
     try {
         player = new Player(400, 300);
         gameScene.addEntity(player);
+
+        enemy = new Entity(700, 400);
+        gameScene.addEntity(enemy);
 
         mainCamera.follow(player);
         mainCamera.setSmoothing(true, 0.1);
@@ -50,9 +54,11 @@ async function initializeGame() {
 
 /**
 * Start is called once the engine and game are fully loaded
+* Attach scripts here
 */
 async function start() {
     await player.attachScript('PlayerController');
+    await enemy.attachScript('EnemyShooter');
 }
 
 window.addEventListener('load', initializeGame);
