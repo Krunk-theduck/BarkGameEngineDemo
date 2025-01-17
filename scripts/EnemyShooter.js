@@ -56,8 +56,8 @@ export default class EnemyShooter {
     }
 
     updateRotation() {
-        const deltaX = (this.target.x + this.target.collisionBounds.offset.x) - this.x;
-        const deltaY = (this.target.y + this.target.collisionBounds.offset.y) - this.y;
+        const deltaX = (this.target.x - this.target.collisionBounds.offset.x) - this.x;
+        const deltaY = (this.target.y - this.target.collisionBounds.offset.y) - this.y;
     
         const angleRadians = Math.atan2(deltaY, deltaX);
 
