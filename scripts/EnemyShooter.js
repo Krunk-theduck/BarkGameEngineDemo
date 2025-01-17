@@ -9,7 +9,7 @@ export default class EnemyShooter {
         this.target = null;
         
         this.shootTimer = 0;
-        this.shootDelay = 1000;
+        this.shootDelay = 3;
     }
 
     async init() {
