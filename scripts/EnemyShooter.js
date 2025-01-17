@@ -24,6 +24,7 @@ export default class EnemyShooter {
 
     async init() {
         this.target = engine.currentScene.entities.values().next().value;
+        this.entity.render = this.render;
     }
 
     update(deltaTime) {
