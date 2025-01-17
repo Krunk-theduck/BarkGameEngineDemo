@@ -179,6 +179,7 @@ class Debug {
             flex-direction: column;
             border-right: 1px solid #333;
             box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+            min-width: 300px;
         `;
 
         // Create toggle button
