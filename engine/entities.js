@@ -40,6 +40,67 @@ class Entity {
             height: 0,
             offset: { x: 0, y: 0 }
         };
+
+        // Script management
+        this.scripts = new Map(); // Store active scripts
+        this.scriptInstances = new Map(); // Store script instance data
+    }
+
+    /**
+     * Attach a script to this entity
+     * @param {string} scriptName Name of the script to attach
+     * @returns {Promise<Object|null>} The script instance or null if failed
+     */
+    async attachScript(scriptName) {
+        try {
+            // If script isn't loaded yet, load it
+            if (!window.engine.isScriptLoaded(scriptName)) {
+                const success = await window.engine.loadScript(scriptName);
+                if (!success) {
+                    throw new Error(`Failed to load script: ${scriptName}`);
+                }
+            }
+
+            // Don't attach if already attached
+            if (this.scripts.has(scriptName)) {
+                console.warn(`Script ${scriptName} is already attached to this entity`);
+                return this.scripts.get(scriptName);
+            }
+
+            // Get script class and create instance
+            const ScriptClass = window.engine.scripts.get(scriptName);
+            const scriptInstance = new ScriptClass(this);
+            this.scripts.set(scriptName, scriptInstance);
+
+            // Initialize if it has init method
+            if (typeof scriptInstance.init === 'function') {
+                await scriptInstance.init();
+            }
+
+            if (window.engine.debug.enabled) {
+                window.engine.debug.trackObject(scriptName, scriptInstance);
+            }
+
+            return scriptInstance;
+        } catch (error) {
+            console.error(`Error attaching script ${scriptName}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Detach a script from this entity
+     * @param {string} scriptName Name of the script to detach
+     */
+    async detachScript(scriptName) {
+        const script = this.scripts.get(scriptName);
+        if (script) {
+            // Call cleanup method if it exists
+            if (typeof script.onDetach === 'function') {
+                await script.onDetach();
+            }
+            this.scripts.delete(scriptName);
+        }
     }
 
     /**
@@ -48,6 +109,13 @@ class Entity {
      */
     update(deltaTime) {
         if (!this.active) return;
+
+        // Update all attached scripts
+        for (const script of this.scripts.values()) {
+            if (typeof script.update === 'function') {
+                script.update(deltaTime);
+            }
+        }
 
         // Update position based on velocity
         this.x += this.velocityX * deltaTime;
@@ -223,6 +291,7 @@ class Player extends Entity {
             down: false,
             left: false,
             right: false,
+            space: false,
             action: false
         };
 
@@ -247,6 +316,7 @@ class Player extends Entity {
             case 's': case 'arrowdown': this.input.down = true; break;
             case 'a': case 'arrowleft': this.input.left = true; break;
             case 'd': case 'arrowright': this.input.right = true; break;
+            case ' ': case 'space': this.input.space = true; break;
             case ' ': case 'enter': this.input.action = true; break;
         }
     }
@@ -261,6 +331,7 @@ class Player extends Entity {
             case 's': case 'arrowdown': this.input.down = false; break;
             case 'a': case 'arrowleft': this.input.left = false; break;
             case 'd': case 'arrowright': this.input.right = false; break;
+            case ' ': case 'space': this.input.space = false; break;
             case ' ': case 'enter': this.input.action = false; break;
         }
     }
