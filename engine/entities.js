@@ -291,7 +291,6 @@ class Player extends Entity {
             down: false,
             left: false,
             right: false,
-            space: false,
             action: false
         };
 
@@ -331,7 +330,6 @@ class Player extends Entity {
             case 's': case 'arrowdown': this.input.down = false; break;
             case 'a': case 'arrowleft': this.input.left = false; break;
             case 'd': case 'arrowright': this.input.right = false; break;
-            case ' ': case 'space': this.input.space = false; break;
             case ' ': case 'enter': this.input.action = false; break;
         }
     }
