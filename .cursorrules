@@ -3,8 +3,6 @@
         "context_initialization": {
             "description": "Starting point for each interaction",
             "steps": [
-                "ALWAYS read `.notes/project_overview.md` and `.notes/task_list.md`",
-                "Record all learnings and decisions in `.notes/meeting_notes.md`"
             ]
         },
         "operational_protocol": {
@@ -23,16 +21,11 @@
             "NEVER break type safety",
             "ALWAYS maintain proper error handling",
             "ALWAYS document new code",
-            "ALWAYS document learnings in `.notes/meeting_notes.md`",
             "ENSURE consistent frame rate",
             "VALIDATE canvas operations",
             "CHECK memory usage with multiple canvases"
         ],
         "priorities": [
-            {
-                "source": ".notes/",
-                "weight": 1.0
-            },
             {
                 "source": "engine/",
                 "weight": 0.9
@@ -119,10 +112,6 @@
                 "primary": "white",
                 "accent": "blue",
                 "style": "minimal"
-            },
-            "documentation": {
-                "learnings_path": ".notes/meeting_notes.md",
-                "auto_document": true
             }
         }
     }

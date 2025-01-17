@@ -650,7 +650,6 @@ class Debug {
      * @param {any} object 
      */
     trackObject(key, object) {
-        console.log('Tracking object:', key, object);
         this.trackedObjects.set(key, object);
         this.updateConsole();
     }

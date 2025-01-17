@@ -284,4 +284,109 @@ class Engine {
             requestAnimationFrame(this.gameLoop);
         }
     }
+
+    /**
+     * Get the override class
+     * @returns {Override}
+     */
+    getOverride() {
+        return Override;
+    }
+}
+
+const Override = class {
+    constructor(entity, instance) {
+        this.entity = entity;
+        this.instance = instance;
+    }
+
+    getFunctionByName(functionName) {
+        if (!this.entity || typeof functionName !== 'string') {
+            return null;
+        }
+
+        const fn = this.entity[functionName];
+        if (typeof fn === 'function') {
+            return fn.bind(this.entity);
+        }
+
+    return null;
+    }
+
+    /**
+     * Adds a function to run before the original entity function
+     * @param {string} functionName - Name of the function to modify
+     * @param {Function} fn - Function to run before
+     * @returns {boolean} Success status of the operation
+     */
+    before(functionName, fn) {
+        const originalFn = this.getFunctionByName(functionName);
+        if (!originalFn) {
+            return false;
+        }
+
+        const boundNewFn = fn.bind(this.instance);
+        
+        this.entity[functionName] = function(...args) {
+            boundNewFn.apply(this.instance, args);
+            return originalFn.apply(this.instance, args);
+        }.bind(this.entity);
+
+        return true;
+    }
+
+    /**
+     * Replaces the original entity function
+     * @param {string} functionName - Name of the function to replace
+     * @param {Function} fn - Function to replace with
+     * @returns {boolean} Success status of the operation
+     */
+    replace(functionName, fn) {
+        console.log('replace', functionName, fn);
+        const originalFn = this.getFunctionByName(functionName);
+        if (!originalFn) {
+            return false;
+        }
+
+        this.entity[functionName] = fn.bind(this.instance);
+        return true;
+    }
+
+    /**
+     * Adds a function to run after the original entity function
+     * @param {string} functionName - Name of the function to modify
+     * @param {Function} fn - Function to run after
+     * @returns {boolean} Success status of the operation
+     */
+    after(functionName, fn) {
+        const originalFn = this.getFunctionByName(functionName);
+        if (!originalFn) {
+            return false;
+        }
+
+        const boundNewFn = fn.bind(this.instance);
+        
+        this.entity[functionName] = function(...args) {
+            const result = originalFn.apply(this.instance, args);
+            boundNewFn.apply(this.instance, args);
+            return result;
+        }.bind(this.entity);
+
+        return true;
+    }
+
+    /**
+     * @deprecated Use before(), after(), or replace() instead
+     */
+    modifyEntityFunction(functionName, type, newFn) {
+        if (type === 'before') {
+            return this.before(functionName, newFn);
+        } else if (type === 'after') {
+            return this.after(functionName, newFn);
+        } else if (type === 'replace') {
+            return this.replace(functionName, newFn);
+        }
+        return false;
+    }
+
 }

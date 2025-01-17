@@ -7,10 +7,18 @@ export default class ExampleScript {
     async init() {
         // Called when script is attached
         // Can be async for loading resources
+
+        // Bind render method to original entity
+        this.entity.render = this.render.bind(this);
     }
 
     update(deltaTime) {
         // Called every frame while attached
+    }
+
+    render() {
+        // Develope a custom render method here
+        let ctx = window.mainCamera.ctx;
     }
 
     async onDetach() {

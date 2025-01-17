@@ -276,6 +276,8 @@ class Player extends Entity {
         this.speed = 200;
         this.width = 32;
         this.height = 32;
+        this.relativeX = 0;
+        this.relativeY = 0;
         
         // Collision properties
         this.solid = true;
@@ -416,18 +418,18 @@ class Player extends Entity {
     render(ctx) {
         ctx.save();
         
-        // Position and transform
-        ctx.translate(this.x, this.y);
+        let translatedX = this.x;
+        let translatedY = this.y;
+        ctx.translate(translatedX, translatedY);
+        let matrix = ctx.getTransform();
+        this.relativeX = matrix.e;
+        this.relativeY = matrix.f;
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
 
         // Draw player (blue rectangle with direction indicator)
         ctx.fillStyle = '#0088ff';
         ctx.fillRect(-16, -16, 32, 32);
-        
-        // Direction indicator (front of player)
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, -8, 16, 16);
 
         // Debug: draw collision bounds if debug is enabled
         if (window.engine?.debug?.enabled) {

@@ -20,11 +20,25 @@ export default class EnemyShooter {
         
         this.shootTimer = 0;
         this.shootDelay = 3;
+
+        this.pointerBounds = {
+            offset: {
+                x: 8,
+                y: -2,
+            },
+            width: 8,
+            height: 8,
+        }
+
+        
     }
 
     async init() {
         this.target = engine.currentScene.entities.values().next().value;
-        this.entity.render = this.render;
+        this.entity.render = this.render.bind(this);
+
+        const override = new Override(this.entity, this);
+        override.replace('render', this.render);
     }
 
     update(deltaTime) {
@@ -35,24 +49,21 @@ export default class EnemyShooter {
         }
 
         this.updateRotation();
-        this.render();
     }
 
     shoot() {
-        console.log("pew");
+        console.log(this.getPointerCenter());
     }
 
     updateRotation() {
         const deltaX = (this.target.x + this.target.collisionBounds.offset.x) - this.x;
         const deltaY = (this.target.y + this.target.collisionBounds.offset.y) - this.y;
-        
-        // Calculate the angle in radians
+    
         const angleRadians = Math.atan2(deltaY, deltaX);
-        
-        // Convert the angle to degrees (optional)
+
         let angleDegrees = angleRadians * (180 / Math.PI);
         
-        // Normalize the angle to [0, 360] degrees if needed
+
         if (angleDegrees < 0) {
             angleDegrees += 360;
         }
@@ -64,32 +75,51 @@ export default class EnemyShooter {
         let ctx = window.mainCamera.ctx;
         ctx.save();
         
-        // Position and transform
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation);
+        
+        ctx.rotate(this.rotation * Math.PI / 180);
+        
         ctx.scale(this.scale.x, this.scale.y);
 
-        // Draw player (blue rectangle with direction indicator)
-        ctx.fillStyle = '#0088ff';
-        ctx.fillRect(-16, -16, 32, 32);
+        ctx.fillStyle = 'red';
         
-        // Direction indicator (front of player)
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, -8, 16, 16);
+        ctx.fillRect(this.collisionBounds.offset.x, this.collisionBounds.offset.y, this.collisionBounds.width, this.collisionBounds.height);
+        
+        ctx.fillStyle = 'red';
+        ctx.fillRect(this.pointerBounds.offset.x + this.pointerBounds.offset.x, this.pointerBounds.offset.y + this.pointerBounds.offset.y, this.pointerBounds.width, this.pointerBounds.height);
 
-        // Debug: draw collision bounds if debug is enabled
-        if (window.engine?.debug?.enabled) {
-            ctx.strokeStyle = '#00ff00';
-            ctx.lineWidth = 1;
+        ctx.restore();
+
+        if (window.engine.debug.enabled) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation * Math.PI / 180);
+            ctx.strokeStyle = 'purple';
+            ctx.lineWidth = 1.5;
             ctx.strokeRect(
                 this.collisionBounds.offset.x,
                 this.collisionBounds.offset.y,
                 this.collisionBounds.width,
                 this.collisionBounds.height
             );
+            ctx.restore();
         }
+    }
 
-        ctx.restore();
+    getPointerCenter() {
+        const relativeX = this.pointerBounds.offset.x + this.pointerBounds.offset.x + (this.pointerBounds.width / 2);
+        const relativeY = this.pointerBounds.offset.y + this.pointerBounds.offset.y + (this.pointerBounds.height / 2);
+        
+        const rotationRad = this.rotation * Math.PI / 180;
+        
+        const rotatedX = relativeX * Math.cos(rotationRad) - relativeY * Math.sin(rotationRad);
+        const rotatedY = relativeX * Math.sin(rotationRad) + relativeY * Math.cos(rotationRad);
+
+        return {
+            x: this.x + rotatedX,
+            y: this.y + rotatedY,
+            rotation: this.rotation
+        };
     }
 
     async onDetach() {
