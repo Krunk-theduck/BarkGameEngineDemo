@@ -11,11 +11,12 @@ engine.setDebug(true, {
 });
 
 const gameScene = new Scene();
+var player;
 
 async function initializeGame() {
     console.log('Bark Engine initializing...');
     try {
-        const player = new Player(400, 300);
+        player = new Player(400, 300);
         gameScene.addEntity(player);
 
         mainCamera.follow(player);
@@ -40,9 +41,18 @@ async function initializeGame() {
         engine.initializeSystems();
         console.log('Bark Engine started successfully');
 
+        start();
+
     } catch (error) {
         console.error('Failed to initialize game:', error);
     }
+}
+
+/**
+* Start is called once the engine and game are fully loaded
+*/
+async function start() {
+    await player.attachScript('PlayerController');
 }
 
 window.addEventListener('load', initializeGame);
