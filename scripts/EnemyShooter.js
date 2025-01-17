@@ -24,6 +24,7 @@ export default class EnemyShooter {
         }
 
         this.updateRotation();
+        this.render();
     }
 
     shoot() {
