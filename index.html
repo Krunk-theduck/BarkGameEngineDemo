@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bark Engine Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+    </div>
+
+    <!-- Engine Core -->
+    <script src="engine/debug.js"></script>
+    <script src="engine/engine.js"></script>
+    <script src="engine/scene.js"></script>
+    <script src="engine/entities.js"></script>
+    <script src="engine/camera.js"></script>
+
+    <script src="main.js"></script>
+</body>
+</html>
