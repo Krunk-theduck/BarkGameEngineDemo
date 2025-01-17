@@ -28,7 +28,7 @@
   - [🎮 Entities](#entities)
   - [🐛 Debug](#debug)
   - [📜 Scripts](#-scripts)
-- [Basic HTML Setup](#-getting-started)
+- [Basic HTML Setup](#-basic-html-setup)
 - [🎮 Quick Start](#-quick-start)
 - [🚀 Upcoming Features](#-upcoming-features)
   - [🎨 Image & Texture System](#-image--texture-system)
