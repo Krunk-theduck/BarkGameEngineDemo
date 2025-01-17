@@ -20,7 +20,7 @@ export default class PlayerController {
 
     update(deltaTime) {
         const input = {
-            space: this.player.input.space
+            space: this.player.input.action
         };
 
         // Custom movement behavior
