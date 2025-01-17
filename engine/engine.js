@@ -25,7 +25,11 @@ class Engine {
         
         // Initialize core systems
         this.initializeSystems();
-
+        
+        // Script system
+        this.scripts = new Map(); // Registered script classes
+        this.scriptCache = new Map(); // Cached script modules
+        
         // Register engine components with debug console
         if (this.debug) {
             this.debug.trackObject('engine', this);
@@ -41,9 +45,69 @@ class Engine {
     }
 
     /**
+     * Dynamically load and register a script
+     * @param {string} scriptName Name of the script to load (without .js extension)
+     * @returns {Promise<boolean>} Success state of loading
+     */
+    async loadScript(scriptName) {
+        try {
+            // Check if already loaded
+            if (this.scripts.has(scriptName)) {
+                console.log(`Script ${scriptName} is already loaded`);
+                return true;
+            }
+
+            // Dynamically import the script module
+            const scriptModule = await import(`../scripts/${scriptName}.js`);
+            
+            // Store in cache and register
+            this.scriptCache.set(scriptName, scriptModule);
+            if (scriptModule.default) {
+                this.scripts.set(scriptName, scriptModule.default);
+                console.log(`Successfully loaded script: ${scriptName}`);
+                return true;
+            } else {
+                console.error(`Script ${scriptName} has no default export`);
+                return false;
+            }
+        } catch (error) {
+            console.error(`Failed to load script ${scriptName}:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Unload a script from the engine
+     * @param {string} scriptName Name of script to unload
+     */
+    unloadScript(scriptName) {
+        // Remove from registries
+        this.scripts.delete(scriptName);
+        this.scriptCache.delete(scriptName);
+
+        // Find all entities using this script and detach it
+        if (this.currentScene) {
+            for (const entity of this.currentScene.entities) {
+                if (entity.scripts?.has(scriptName)) {
+                    entity.detachScript(scriptName);
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if a script is loaded
+     * @param {string} scriptName Name of script to check
+     * @returns {boolean}
+     */
+    isScriptLoaded(scriptName) {
+        return this.scripts.has(scriptName);
+    }
+
+    /**
      * Initialize core engine systems
      */
-    initializeSystems() {
+    async initializeSystems() {
         // Bind methods
         this.gameLoop = this.gameLoop.bind(this);
         this.handleDebugKeys = this.handleDebugKeys.bind(this);
