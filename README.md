@@ -11,6 +11,8 @@
   
   *A lightweight, code-first JavaScript game engine for rapid 2D game development*
 
+  [**🌐 Try the Demo**](https://krunk-theduck.github.io/BarkGameEngineDemo/) 
+
   [Features](#features) •
   [Quick Start](#quick-start) •
   [Documentation](#documentation) •
