@@ -1,9 +1,9 @@
 // scripts/EnemyShooter.js
 export default class EnemyShooter {
-    constructor(entity, x, y) {
+    constructor(entity) {
         this.entity = entity;
-        this.x = x;
-        this.y = y;
+        this.x = entity.x;
+        this.y = entity.y;
         this.rotation = 0;
 
         this.scale = {
