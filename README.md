@@ -13,7 +13,7 @@
   [**🌐 Try the Demo**](https://krunk-theduck.github.io/BarkGameEngineDemo/) 
 
   [Features](#features) •
-  [Quick Start](#quick-start) •
+  [Quick Start](#quick-start)
 
 </div>
 
