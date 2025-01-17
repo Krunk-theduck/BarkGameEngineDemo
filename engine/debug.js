@@ -184,24 +184,30 @@ class Debug {
         // Create toggle button
         this.toggleButton = document.createElement('button');
         this.toggleButton.className = 'debug-console-toggle';
-        this.toggleButton.innerHTML = '▶';
+        this.toggleButton.innerHTML = `
+            <div class="toggle-content" style="color: #e0e0e0;">
+                <span class="toggle-arrow" style="color: #2ecc71;">▶</span>
+                <div class="toggle-text-container">
+                    <span class="toggle-text" style="color: #2ecc71;">BARK ENGINE</span>
+                    <span class="toggle-subtext" style="color: #888;">Debug Console</span>
+                </div>
+            </div>
+        `;
         this.toggleButton.style.cssText = `
             position: absolute;
-            right: -20px;
-            top: 10px;
-            width: 20px;
-            height: 20px;
+            right: -120px;
+            top: 20px;
+            width: 120px;
+            height: 60px;
             background: #1a1a1a;
-            color: #e0e0e0;
             border: none;
+            border-radius: 0 8px 8px 0;
             cursor: pointer;
             padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0 3px 3px 0;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-            transition: background-color 0.2s;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid #2ecc71;
+            z-index: 999;
         `;
 
         // Add hover effect for toggle button
@@ -211,6 +217,87 @@ class Debug {
         this.toggleButton.addEventListener('mouseleave', () => {
             this.toggleButton.style.backgroundColor = '#1a1a1a';
         });
+        const style = document.createElement('style');
+        // Add to style element
+        style.textContent += `
+            .debug-console-toggle .toggle-content {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 12px;
+                color: #e0e0e0;
+                height: 100%;
+                padding: 0 12px;
+            }
+
+            .debug-console-toggle .toggle-text-container {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+
+            .debug-console-toggle .toggle-text {
+                font-family: 'Arial Black', sans-serif;
+                font-size: 14px;
+                font-weight: 900;
+                letter-spacing: 1px;
+                color: #2ecc71;
+                text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+            }
+
+            .debug-console-toggle .toggle-subtext {
+                font-family: Arial, sans-serif;
+                font-size: 11px;
+                color: #888;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .debug-console-toggle .toggle-arrow {
+                font-size: 18px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                color: #2ecc71;
+            }
+
+            .debug-console-toggle:hover {
+                background: #2a2a2a;
+                transform: translateX(-5px);
+                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.4);
+            }
+
+            .debug-console-toggle:hover .toggle-arrow {
+                transform: translateX(-5px);
+            }
+
+            .debug-console-toggle.open {
+                right: 0;
+                border-radius: 0;
+                width: 100px;
+            }
+
+            .debug-console-toggle.open:hover {
+                transform: none;
+            }
+
+            .debug-console-toggle.open .toggle-text-container {
+                display: none;
+            }
+
+            .debug-console-toggle.open .toggle-arrow {
+                transform: rotate(180deg);
+            }
+
+            @keyframes pulseGlow {
+                0% { box-shadow: 2px 0 10px rgba(46, 204, 113, 0.3); }
+                50% { box-shadow: 2px 0 20px rgba(46, 204, 113, 0.5); }
+                100% { box-shadow: 2px 0 10px rgba(46, 204, 113, 0.3); }
+            }
+
+            .debug-console-toggle:not(.open) {
+                animation: pulseGlow 2s infinite;
+            }
+        `;
 
         // Create search input
         this.searchInput = document.createElement('input');
@@ -240,7 +327,6 @@ class Debug {
         `;
 
         // Add custom scrollbar styles
-        const style = document.createElement('style');
         style.textContent = `
             .debug-console-content::-webkit-scrollbar {
                 width: 8px;
@@ -540,8 +626,11 @@ class Debug {
         this.consoleElement.style.width = this.console.isOpen ? 
             `${Math.min(this.console.maxWidth, window.innerWidth - 20)}px` : 
             `${this.console.minWidth}px`;
-        this.toggleButton.innerHTML = this.console.isOpen ? '◀' : '▶';
-
+        
+        // Update toggle button state
+        this.toggleButton.classList.toggle('open');
+        const arrow = this.toggleButton.querySelector('.toggle-arrow');
+        arrow.textContent = this.console.isOpen ? '◀' : '▶';
         
         this.updateConsole();
     }
