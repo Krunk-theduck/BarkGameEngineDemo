@@ -6,6 +6,16 @@ export default class EnemyShooter {
         this.y = y;
         this.rotation = 0;
 
+        this.scale = {
+            x: 1,
+            y: 1,
+        }
+        this.collisionBounds = {
+            offset: { x: -7.5, y: -7.5 },
+            width: 15,
+            height: 15,
+        }
+
         this.target = null;
         
         this.shootTimer = 0;
