@@ -5,8 +5,7 @@
 
   # 🎮 Bark Engine
   
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  ![Version](https://img.shields.io/badge/version-0.1.0-blue)
+  ![Version](https://img.shields.io/badge/version-0.2.1-blue)
   ![Status](https://img.shields.io/badge/status-active-success)
   
   *A lightweight, code-first JavaScript game engine for rapid 2D game development*
@@ -15,9 +14,6 @@
 
   [Features](#features) •
   [Quick Start](#quick-start) •
-  [Documentation](#documentation) •
-  [Examples](#examples) •
-  [Contributing](#contributing)
 
 </div>
 
@@ -83,7 +79,9 @@ git clone https://github.com/yourusername/bark-engine.git
 # Navigate to the project
 cd bark-engine
 
-# Open index.html in your browser
+# Using node or python start a local server and serve index.html
+
+# Open LocalHost for your provider in the browser
 ```
 
 ## 🎮 Demo Game
@@ -93,31 +91,17 @@ The included demo game showcases Bark Engine's core features:
 - Debug system functionality
 - Scene management
 - Asset loading
-
-## 📚 Documentation
-
-- [Engine Architecture](docs/architecture.md)
-- [Debug System](docs/debug-system.md)
-- [Entity System](docs/entity-system.md)
-- [Scene Management](docs/scene-management.md)
+- Script Loading
 
 ## 🛠️ Development
 
 ```bash
 # Structure
 engine/      # Core engine files
-scripts/     # Game-specific scripts (Not implemented yet)
-assets/      # Game assets (Not implemented yet)
+scripts/     # User-Generated scripts
+assets/      # Game assets
 docs/        # Documentation (Not implemented yet)
 ```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🌟 Acknowledgments
 
@@ -128,10 +112,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-  
-  **[Website](https://bark-engine.dev)** •
-  **[Documentation](https://docs.bark-engine.dev)** •
-  **[Examples](https://examples.bark-engine.dev)**
 
   <sub>Built with ❤️ by the Bark Engine Team</sub>
 </div>
