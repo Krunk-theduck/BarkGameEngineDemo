@@ -1,4 +1,6 @@
 // scripts/EnemyShooter.js
+import Projectile from './Projectile.js';
+
 export default class EnemyShooter {
     constructor(entity) {
         this.entity = entity;
@@ -42,6 +44,7 @@ export default class EnemyShooter {
     }
 
     update(deltaTime) {
+        
         this.shootTimer += deltaTime;
         if(this.shootTimer >= this.shootDelay) {
             this.shoot();
@@ -51,13 +54,22 @@ export default class EnemyShooter {
         this.updateRotation();
     }
 
-    shoot() {
-        console.log(this.getPointerCenter());
+    async shoot() {
+
+        let projectile = new Entity(this.entity.x, this.entity.y);
+        engine.currentScene.entities.add(projectile);
+
+        projectile = await projectile.attachScript('Projectile');
+        projectile.x = this.entity.x;
+        projectile.y = this.entity.y;
+        projectile.rotation = this.rotation;
+        projectile.speed = 800;
     }
 
+
     updateRotation() {
-        const deltaX = (this.target.x - this.target.collisionBounds.offset.x) - this.x;
-        const deltaY = (this.target.y - this.target.collisionBounds.offset.y) - this.y;
+        const deltaX = (this.target.x) - this.x;
+        const deltaY = (this.target.y) - this.y;
     
         const angleRadians = Math.atan2(deltaY, deltaX);
 
