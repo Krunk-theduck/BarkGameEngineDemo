@@ -1,3 +1,0 @@
-- Debug box not rendering for enemy
-- Enemy projectiles not rendering
-- Enemy sprite not fitting to enemy collision box
