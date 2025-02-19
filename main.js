@@ -18,9 +18,11 @@ async function initializeGame() {
     console.log('Bark Engine initializing...');
     try {
         player = new Player(400, 300);
+        await player.loadSprite('assets/sprites/player.png');
         gameScene.addEntity(player);
 
         enemy = new Entity(700, 400);
+        await enemy.loadSprite('assets/sprites/enemy.png');
         gameScene.addEntity(enemy);
 
         mainCamera.follow(player);
