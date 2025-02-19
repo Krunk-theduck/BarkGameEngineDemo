@@ -62,11 +62,8 @@ export default class EnemyShooter {
 
         const projectile = await entity.attachScript('Projectile');
         if (!projectile) return;
-    
-        // These settings should be on the entity, not the script
+        
         entity.rotation = this.entity.rotation;
-    
-        // You can set script-specific properties like this:
         projectile.speed = 800;
     }
 
