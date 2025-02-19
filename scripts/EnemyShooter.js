@@ -6,17 +6,17 @@ export default class EnemyShooter {
         this.entity = entity;
         this.x = entity.x;
         this.y = entity.y;
-        this.rotation = 0;
 
         this.scale = {
             x: 1,
             y: 1,
         }
         this.collisionBounds = {
-            offset: { x: -7.5, y: -7.5 },
-            width: 15,
-            height: 15,
-        }
+            offset: { x: -16, y: -16 },  // Center the collision box
+            width: 32,
+            height: 32
+        };
+        this.entity.setCollisionBounds(this.collisionBounds);
 
         this.target = null;
         
@@ -37,10 +37,11 @@ export default class EnemyShooter {
 
     async init() {
         this.target = engine.currentScene.entities.values().next().value;
-        this.entity.render = this.render.bind(this);
 
+        /*
         const override = new Override(this.entity, this);
         override.replace('render', this.render);
+        */
     }
 
     update(deltaTime) {
@@ -56,13 +57,13 @@ export default class EnemyShooter {
 
     async shoot() {
 
-        let projectile = new Entity(this.entity.x, this.entity.y);
-        engine.currentScene.entities.add(projectile);
+        let entity = new Entity(this.entity.x, this.entity.y);
+        engine.currentScene.entities.add(entity);
 
-        projectile = await projectile.attachScript('Projectile');
-        projectile.x = this.entity.x;
-        projectile.y = this.entity.y;
-        projectile.rotation = this.rotation;
+        const projectile = await entity.attachScript('Projectile');
+        if (!projectile) return;
+        
+        entity.rotation = this.entity.rotation;
         projectile.speed = 800;
     }
 
@@ -80,42 +81,7 @@ export default class EnemyShooter {
             angleDegrees += 360;
         }
 
-        this.rotation = angleDegrees;
-    }
-
-    render() {
-        let ctx = window.mainCamera.ctx;
-        ctx.save();
-        
-        ctx.translate(this.x, this.y);
-        
-        ctx.rotate(this.rotation * Math.PI / 180);
-        
-        ctx.scale(this.scale.x, this.scale.y);
-
-        ctx.fillStyle = 'red';
-        
-        ctx.fillRect(this.collisionBounds.offset.x, this.collisionBounds.offset.y, this.collisionBounds.width, this.collisionBounds.height);
-        
-        ctx.fillStyle = 'red';
-        ctx.fillRect(this.pointerBounds.offset.x + this.pointerBounds.offset.x, this.pointerBounds.offset.y + this.pointerBounds.offset.y, this.pointerBounds.width, this.pointerBounds.height);
-
-        ctx.restore();
-
-        if (window.engine.debug.enabled) {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.rotation * Math.PI / 180);
-            ctx.strokeStyle = 'purple';
-            ctx.lineWidth = 1.5;
-            ctx.strokeRect(
-                this.collisionBounds.offset.x,
-                this.collisionBounds.offset.y,
-                this.collisionBounds.width,
-                this.collisionBounds.height
-            );
-            ctx.restore();
-        }
+        this.entity.rotation = angleDegrees;
     }
 
     getPointerCenter() {

@@ -12,6 +12,7 @@ export default class Projectile {
             height: 5,
             radius: 6,
         };
+        this.entity.setCollisionBounds(this.collisionBounds);
     }
 
     init() {
@@ -20,27 +21,37 @@ export default class Projectile {
     }
 
     update(deltaTime) {
-        const radian = this.rotation * (Math.PI / 180);
-        this.x += Math.cos(radian) * this.speed * deltaTime;
-        this.y += Math.sin(radian) * this.speed * deltaTime;
+        const radian = this.entity.rotation * (Math.PI / 180);
+        this.entity.x += Math.cos(radian) * this.speed * deltaTime;
+        this.entity.y += Math.sin(radian) * this.speed * deltaTime;
     }
 
-    render() {
-        const ctx = window.mainCamera.ctx;
+    render(ctx) {
+        if (!this.entity.visible) return;
+        
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation * Math.PI / 180);
+        ctx.translate(this.entity.x, this.entity.y);
+        ctx.rotate(this.entity.rotation * Math.PI / 180);
+        ctx.globalAlpha = this.entity.alpha;
+        
+        // Draw projectile
         ctx.fillStyle = 'orange';
-
         ctx.beginPath();
-        ctx.arc(
-            this.collisionBounds.offset.x, 
-            this.collisionBounds.offset.y, 
-            this.collisionBounds.radius, 
-            0, 
-            2 * Math.PI
-        );
+        ctx.arc(0, 0, this.collisionBounds.radius, 0, 2 * Math.PI);
         ctx.fill();
+        
+        // Debug: draw collision bounds if debug is enabled
+        if (window.engine?.debug?.enabled) {
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(
+                this.collisionBounds.offset.x,
+                this.collisionBounds.offset.y,
+                this.collisionBounds.width,
+                this.collisionBounds.height
+            );
+        }
+        
         ctx.restore();
     }
 }
