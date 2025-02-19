@@ -12,10 +12,11 @@ export default class EnemyShooter {
             y: 1,
         }
         this.collisionBounds = {
-            offset: { x: -7.5, y: -7.5 },
-            width: 15,
-            height: 15,
-        }
+            offset: { x: -16, y: -16 },  // Center the collision box
+            width: 32,
+            height: 32
+        };
+        this.entity.setCollisionBounds(this.collisionBounds);
 
         this.target = null;
         
@@ -56,13 +57,16 @@ export default class EnemyShooter {
 
     async shoot() {
 
-        let projectile = new Entity(this.entity.x, this.entity.y);
-        engine.currentScene.entities.add(projectile);
+        let entity = new Entity(this.entity.x, this.entity.y);
+        engine.currentScene.entities.add(entity);
 
-        projectile = await projectile.attachScript('Projectile');
-        projectile.x = this.entity.x;
-        projectile.y = this.entity.y;
-        projectile.rotation = this.rotation;
+        const projectile = await entity.attachScript('Projectile');
+        if (!projectile) return;
+    
+        // These settings should be on the entity, not the script
+        entity.rotation = this.entity.rotation;
+    
+        // You can set script-specific properties like this:
         projectile.speed = 800;
     }
 
