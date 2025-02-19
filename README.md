@@ -26,6 +26,7 @@
   - [🎬 Scene](#scene)
   - [📷 Camera](#camera)
   - [🎮 Entities](#entities)
+  - [🍋 Sprites](#sprites)
   - [🐛 Debug](#debug)
   - [📜 Scripts](#-scripts)
 - [Basic HTML Setup](#-basic-html-setup)
@@ -70,6 +71,7 @@ Bark Engine is built around five fundamental components, each designed to handle
 | [🎬 Scene](#scene) | Handles scene management, object hierarchies, and scene transitions |
 | [📷 Camera](#camera) | Controls viewport, rendering, and manages multiple camera perspectives |
 | [🎮 Entities](#entities) | Provides the entity component system for game objects and behaviors |
+| [🍋 Sprites](#sprites) | A simple way to import and render prebuilt sprites, as well as set collision |
 | [🐛 Debug](#debug) | Offers development tools, logging, and performance monitoring |
 | [📜 Scripts](#scripts) | Provides a flexible, Unity-like component architecture for game behaviors |
 
@@ -210,14 +212,13 @@ The Entities system provides the foundation for all game objects in Bark Engine.
 
 ### Basic Usage
 ```javascript
-// Create a basic entity
-const entity = new Entity(100, 100);
+let entity = new Entity(this.entity.x, this.entity.y);
+engine.currentScene.entities.add(entity);
 
-// Set up collision bounds
-entity.setCollisionBounds(32, 32, -16, -16);
-
-// Attach a behavior script
-await entity.attachScript('EnemyBehavior');
+const script = await entity.attachScript('script');
+    
+// You can set script-specific properties like this:
+script.speed = 800;
 
 // Add tags for identification
 entity.addTag('enemy');
@@ -226,9 +227,6 @@ entity.addTag('hostile');
 // Store custom data
 entity.setData('health', 100);
 entity.setData('damage', 25);
-
-// Create a player instance
-const player = new Player(150, 150);
 ```
 
 ### Key Features
@@ -239,6 +237,22 @@ const player = new Player(150, 150);
 - **Custom Data Storage**: Flexible key-value storage for entity-specific data
 - **Debug Visualization**: Built-in debug rendering for collision bounds
 - **Player Singleton**: Specialized Player class with input handling and movement
+
+## Sprites
+[🔝 Back to Top](#-bark-engine)
+
+The sprite system allows you to quickl load images and assign them to entities. The sprite system will take care of the rendering, and collision for you, although it provides ways to customize that.
+
+### Basic Usage
+```javascript
+var player;
+
+player = new Player(400, 300);
+
+// Sprites can be loaded at anytime if served on a webpage
+await player.loadSprite('assets/sprites/player.png');
+gameScene.addEntity(player);
+```
 
 ## Debug
 [🔝 Back to Top](#-bark-engine)
@@ -321,7 +335,7 @@ export default class ExampleScript {
 
 ### Example: Player Controller
 
-Here's a practical example of a script that handles player movement and rotation:
+Here's an example of a player controller, notice how easy it is to start:
 
 ```javascript
 // scripts/PlayerController.js
@@ -329,37 +343,22 @@ export default class PlayerController {
     constructor(entity) {
         this.entity = entity;
         this.rotation = 0;
-        this.mouseX = 0;
-        this.mouseY = 0;
-        this.setupMouseTracking();
+
+        this.player = entity instanceof Player ? entity : null;
+    }
+
+    init() {        
+        if (!this.player) {
+            console.error('PlayerController can only be attached to Player instances');
+            return;
+        }
     }
 
     update(deltaTime) {
-        // Handle player rotation based on mouse position
-        const screenX = window.mainCamera.canvas.offsetParent.offsetLeft + this.entity.relativeX;
-        const screenY = window.mainCamera.canvas.offsetParent.offsetTop + this.entity.relativeY;
-        
-        const dx = this.mouseX - screenX;
-        const dy = this.mouseY - screenY;
-        this.rotation = Math.atan2(dy, dx);
     }
 
-    render(ctx) {
-        // Custom player rendering with rotation
-        ctx.save();
-        ctx.translate(this.entity.x, this.entity.y);
-        ctx.rotate(this.rotation);
-        
-        // Draw player triangle
-        ctx.beginPath();
-        ctx.moveTo(55, 0);
-        ctx.lineTo(30, -10);
-        ctx.lineTo(30, 10);
-        ctx.closePath();
-        ctx.fillStyle = '#0088ff';
-        ctx.fill();
-        
-        ctx.restore();
+    onDetach() {
+        console.log('PlayerController detached');
     }
 }
 ```
@@ -439,67 +438,81 @@ Once your HTML is set up, you can start building your game in `main.js`. The eng
 Your `main.js` file is where your game comes to life. Here's a complete example of setting up a simple game with a player, enemy, and map:
 
 ```javascript
-// Initialize core systems
+// Create engines and cameras (setting global properties using window is optional)
 const engine = new Engine();
 const mainCamera = new Camera(800, 600);
 window.mainCamera = mainCamera;
 window.engine = engine;
 
-// Configure debug tools
+// If you want to use debug
 engine.setDebug(true, {
+    pauseKey: 'F8',
     showFPS: true,
     showDelta: true,
     showEntityCount: true
 });
 
-// Create main game scene
+// Create a scene
 const gameScene = new Scene();
 var player;
 var enemy;
 
 async function initializeGame() {
-    console.log('Initializing game...');
-    
-    // Create and add player
-    player = new Player(400, 300);
-    gameScene.addEntity(player);
-
-    // Create and add enemy
-    enemy = new Entity(700, 400);
-    gameScene.addEntity(enemy);
-
-    // Set up camera
-    mainCamera.follow(player);
-    mainCamera.setSmoothing(true, 0.1);
-
-    // Set up scene
-    engine.addScene('main', gameScene);
-    engine.loadScene('main');
-
-    // Load map (with error handling)
+    console.log('Bark Engine initializing...');
     try {
-        await gameScene.loadMap(
-            'assets/maps/map.png',
-            'assets/maps/map_col.png'
-        );
-        mainCamera.setBounds(0, 0, 1920, 1080);
-    } catch (error) {
-        console.warn('Map not loaded:', error);
-        mainCamera.setBounds(0, 0, 800, 600);
-    }
+        // Create player with x and y coordinates
+        player = new Player(400, 300);
+        await player.loadSprite('assets/sprites/player.png'); // Attach a sprite to the player to auto render
+        gameScene.addEntity(player); // Always add entities to the gamescene
 
-    // Initialize and start
-    engine.initializeSystems();
-    start();
+        enemy = new Entity(700, 400);
+        await enemy.loadSprite('assets/sprites/enemy.png');
+        gameScene.addEntity(enemy);
+
+        // Setup the main camera
+        mainCamera.follow(player);
+        mainCamera.setSmoothing(true, 0.1);
+
+        // Loading the scene requires it to be added and then loaded
+        engine.addScene('main', gameScene);
+        engine.loadScene('main');
+
+        try {
+            // Load map with texture map first, then collision map
+            await gameScene.loadMap(
+                'assets/maps/map.png',
+                'assets/maps/map_col.png',
+                32
+            );
+            // Set bounds, x, y, image resolution x, y
+            mainCamera.setBounds(0, 0, 1920, 1080);
+            console.log('Map assets loaded successfully');
+        } catch (mapError) {
+            console.warn('Maps not loaded:', mapError);
+            mainCamera.setBounds(0, 0, 800, 600);
+        }
+
+        // Load engine, rendering, entities, scene
+        engine.initializeSystems();
+        console.log('Bark Engine started successfully');
+
+        // Open first scene and play
+        start();
+
+    } catch (error) {
+        console.error('Failed to initialize game:', error);
+    }
 }
 
-// Attach behavior scripts
+/**
+* Start is called once the engine and game are fully loaded
+* Attach scripts here
+*/
 async function start() {
     await player.attachScript('PlayerController');
-    await enemy.attachScript('EnemyBehavior');
+    await enemy.attachScript('EnemyShooter');
 }
 
-// Start when page loads
 window.addEventListener('load', initializeGame);
 ```
 
@@ -546,19 +559,7 @@ This setup provides a solid foundation for building your game. From here, you ca
 We're actively working on expanding Bark Engine's capabilities with new systems to make game development even more streamlined and powerful.
 
 ### 🎨 Image & Texture System
-- **Easy Asset Loading**: Simple API for loading and managing game assets
-- **Texture Atlas Support**: Efficient sprite sheet and texture atlas handling
-- **Resource Management**: Automatic memory management and asset caching
 - **Format Support**: Wide range of image format support (PNG, JPEG, WebP)
-```javascript
-// Coming soon:
-await engine.loadTexture('player', 'assets/sprites/player.png');
-await entity.setSprite('player');
-
-// Texture atlas support
-await engine.loadAtlas('characters', 'assets/atlas/characters.json');
-entity.setFrameFromAtlas('characters', 'player_idle');
-```
 
 ### 🎬 Animation System
 - **Frame-Based Animation**: Easy-to-use sprite animation system
