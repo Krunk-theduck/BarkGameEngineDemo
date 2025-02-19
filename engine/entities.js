@@ -184,11 +184,11 @@ class Entity {
      * @param {number} offsetX - X offset from entity position
      * @param {number} offsetY - Y offset from entity position
      */
-    setCollisionBounds(width, height, offsetX = 0, offsetY = 0) {
-        this.collisionBounds.width = width;
-        this.collisionBounds.height = height;
-        this.collisionBounds.offset.x = offsetX;
-        this.collisionBounds.offset.y = offsetY;
+    setCollisionBounds(obj) {
+        this.collisionBounds.width = obj.width;
+        this.collisionBounds.height = obj.height;
+        this.collisionBounds.offset.x = obj.offset.x;
+        this.collisionBounds.offset.y = obj.offset.y;
     }
 
     /**
@@ -224,23 +224,33 @@ class Entity {
     render(ctx) {
         if (!this.visible) return;
 
-        // Save context state
         ctx.save();
 
-        // Transform
+        // Apply transformations
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation);
+        ctx.rotate(this.rotation * Math.PI / 180);
         ctx.scale(this.scale.x, this.scale.y);
         ctx.globalAlpha = this.alpha;
 
-        // Default entity visualization (override in subclasses for custom rendering)
-        ctx.fillStyle = '#ff0000';  // Default red color
-        ctx.fillRect(
-            -this.width / 2,
-            -this.height / 2,
-            this.width,
-            this.height
-        );
+        if (this.sprite) {
+            // Draw the sprite centered on the entity's position
+            ctx.drawImage(
+                this.sprite,
+                -this.width / 2,
+                -this.height / 2,
+                this.width,
+                this.height
+            );
+        } else {
+            // Default rendering if no sprite is loaded
+            ctx.fillStyle = '#ff0000';  // Default red color
+            ctx.fillRect(
+                -this.width / 2,
+                -this.height / 2,
+                this.width,
+                this.height
+            );
+        }
 
         // Debug: draw collision bounds if debug is enabled
         if (window.engine.debug.enabled) {
@@ -254,8 +264,23 @@ class Entity {
             );
         }
 
-        // Restore context state
         ctx.restore();
+    }
+
+    async loadSprite(spritePath) {
+        try {
+            const image = new Image();
+            image.src = spritePath;
+            await image.decode(); // Ensure the image is fully loaded
+
+            this.sprite = image;
+            this.width = image.width;
+            this.height = image.height;
+
+            console.log(`Sprite loaded: ${spritePath} (${this.width}x${this.height})`);
+        } catch (error) {
+            console.error('Failed to load sprite:', error);
+        }
     }
 }
 
@@ -296,7 +321,12 @@ class Player extends Entity {
             action: false
         };
 
+        // Mouse tracking properties
+        this.mouseX = 0;
+        this.mouseY = 0;
+
         this.setupInputHandlers();
+        this.setupMouseTracking();
     }
 
     /**
@@ -335,6 +365,16 @@ class Player extends Entity {
             case ' ': case 'space': this.input.action = false; break;
             case 'enter': this.input.action = false; break;
         }
+    }
+
+    setupMouseTracking() {
+        window.addEventListener('mousemove', this.updateMousePosition.bind(this));
+    }
+
+    updateMousePosition(e) {
+        const canvas = window.mainCamera.canvas;
+        this.mouseX = e.clientX - canvas.offsetLeft;
+        this.mouseY = e.clientY - canvas.offsetTop;
     }
 
     /**
@@ -384,6 +424,13 @@ class Player extends Entity {
                 script.update(deltaTime);
             }
         }
+
+        const screenX = window.mainCamera.canvas.offsetParent.offsetLeft + this.relativeX;
+        const screenY = window.mainCamera.canvas.offsetParent.offsetTop + this.relativeY;
+        // Calculate angle between player's screen position and mouse
+        const dx = this.mouseX - screenX;
+        const dy = this.mouseY - screenY;
+        this.rotation = Math.atan2(dy, dx);
     }
 
     /**
@@ -416,20 +463,30 @@ class Player extends Entity {
      * @param {CanvasRenderingContext2D} ctx 
      */
     render(ctx) {
+        if (!this.visible) return;
+
         ctx.save();
-        
-        let translatedX = this.x;
-        let translatedY = this.y;
-        ctx.translate(translatedX, translatedY);
-        let matrix = ctx.getTransform();
-        this.relativeX = matrix.e;
-        this.relativeY = matrix.f;
+
+        // Apply transformations
+        ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
         ctx.scale(this.scale.x, this.scale.y);
+        ctx.globalAlpha = this.alpha;
 
-        // Draw player (blue rectangle with direction indicator)
-        ctx.fillStyle = '#0088ff';
-        ctx.fillRect(-16, -16, 32, 32);
+        if (this.sprite) {
+            // Draw the sprite centered on the player's position
+            ctx.drawImage(
+                this.sprite,
+                -this.width / 2,
+                -this.height / 2,
+                this.width,
+                this.height
+            );
+        } else {
+            // Default rendering if no sprite is loaded
+            ctx.fillStyle = '#0088ff';  // Default blue color for player
+            ctx.fillRect(-16, -16, 32, 32);
+        }
 
         // Debug: draw collision bounds if debug is enabled
         if (window.engine?.debug?.enabled) {
@@ -444,5 +501,10 @@ class Player extends Entity {
         }
 
         ctx.restore();
+    }
+
+    onDetach() {
+        // ... existing code ...
+        window.removeEventListener('mousemove', this.updateMousePosition.bind(this));
     }
 }
