@@ -184,11 +184,11 @@ class Entity {
      * @param {number} offsetX - X offset from entity position
      * @param {number} offsetY - Y offset from entity position
      */
-    setCollisionBounds(width, height, offsetX = 0, offsetY = 0) {
-        this.collisionBounds.width = width;
-        this.collisionBounds.height = height;
-        this.collisionBounds.offset.x = offsetX;
-        this.collisionBounds.offset.y = offsetY;
+    setCollisionBounds(obj) {
+        this.collisionBounds.width = obj.width;
+        this.collisionBounds.height = obj.height;
+        this.collisionBounds.offset.x = obj.offset.x;
+        this.collisionBounds.offset.y = obj.offset.y;
     }
 
     /**
