@@ -3,7 +3,7 @@
 
   # 🎮 Bark Engine
   
-  ![Version](https://img.shields.io/badge/version-0.3.1-blue)
+  ![Version](https://img.shields.io/badge/version-0.4.1-blue)
   ![Status](https://img.shields.io/badge/status-active-success)
   
   *A lightweight, code-first JavaScript game engine for rapid 2D game development*
